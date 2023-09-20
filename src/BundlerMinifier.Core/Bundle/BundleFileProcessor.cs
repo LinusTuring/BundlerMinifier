@@ -102,7 +102,7 @@ namespace BundlerMinifier
             var inputs = bundle.GetAbsoluteInputFiles();
             bool changed = false;
 
-            if (bundle.GetAbsoluteInputFiles(true).Count > 1 || bundle.InputFiles.FirstOrDefault() != bundle.OutputFileName)
+            if (bundle.GetAbsoluteInputFiles(true).Count > 1 || bundle.InputFiles.FirstOrDefault() != bundle.OutputFileName || bundle.IsMinificationOnlyEnabled)
             {
                 BundleHandler.ProcessBundle(baseFolder, bundle);
 
@@ -117,7 +117,11 @@ namespace BundlerMinifier
                         DirectoryInfo outputFileDirectory = Directory.GetParent(outputFile);
                         outputFileDirectory.Create();
 
-                        File.WriteAllText(outputFile, bundle.Output, new UTF8Encoding(false));
+                        if (bundle.IsMinificationOnlyEnabled == false)
+                        {
+                            File.WriteAllText(outputFile, bundle.Output, new UTF8Encoding(false));
+                        }
+
                         OnAfterBundling(bundle, baseFolder, containsChanges);
                         changed = true;
                     }
@@ -131,7 +135,7 @@ namespace BundlerMinifier
                 var outputWriteTime = File.GetLastWriteTimeUtc(minFile);
                 var minifyChanged = bundle.MostRecentWrite >= outputWriteTime;
 
-                if (minifyChanged)
+                if (File.Exists(minFile) == false || minifyChanged)
                 {
                     minResult = BundleMinifier.MinifyBundle(bundle);
 

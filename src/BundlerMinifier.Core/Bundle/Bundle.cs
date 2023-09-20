@@ -40,6 +40,14 @@ namespace BundlerMinifier
             }
         }
 
+        internal bool IsMinificationOnlyEnabled
+        {
+            get
+            {
+                return Minify.ContainsKey("minifyOnly") && Minify["minifyOnly"].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         internal bool IsGzipEnabled
         {
             get
